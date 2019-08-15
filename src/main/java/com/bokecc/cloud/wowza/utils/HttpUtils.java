@@ -1,41 +1,24 @@
 package com.bokecc.cloud.wowza.utils;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.bokecc.cloud.wowza.config.HttpClientPoolConfig;
-import com.bokecc.cloud.wowza.constant.HttpClientPoolConst;
 import com.bokecc.cloud.wowza.constant.WowzaAuthConst;
 import com.bokecc.cloud.wowza.enums.*;
 import com.bokecc.cloud.wowza.handler.HttpRequestRetryHandler;
-import com.bokecc.cloud.wowza.httpclient.HttpClientBase;
+import com.bokecc.cloud.wowza.httpclient.BaseHttpClient;
 import com.bokecc.cloud.wowza.sdk.WowzaSDK;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.ParseException;
-import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.*;
-import org.apache.http.config.Registry;
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URI;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -49,18 +32,18 @@ import java.util.stream.Collectors;
  * @author Daniel Zhou / zzx
  *
  */
-public class HttpUtils extends HttpClientBase implements IHttpUtils{
+public class HttpUtils extends BaseHttpClient implements IHttpUtils{
 
     private static final Logger logger = LoggerFactory.getLogger(HttpUtils.class);
 
     /**
      * 连接管理器
      */
-    private static PoolingHttpClientConnectionManager pool;
+    // private static PoolingHttpClientConnectionManager pool;
     /**
      * 请求配置
      */
-    private static RequestConfig requestConfig;
+    // private static RequestConfig requestConfig;
     /**
      * 请求返回json数据头信息map
      */
