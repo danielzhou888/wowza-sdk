@@ -44,25 +44,6 @@ public abstract class BaseHttpClient {
 	 */
 	protected static RequestConfig requestConfig;
 	protected static CloseableHttpClient httpClient;
-	
-	// static{
-	// 	poolingHttpClientConnectionManager = new PoolingHttpClientConnectionManager();
-	// 	poolingHttpClientConnectionManager.setMaxTotal(1024);
-	// 	poolingHttpClientConnectionManager.setDefaultMaxPerRoute(32);
-	// 	// 检测有效连接的间隔
-	// 	poolingHttpClientConnectionManager.setValidateAfterInactivity(2000);
-	// 	SocketConfig socketConfig = SocketConfig.custom().setSoTimeout(1000*5).build();
-	// 	poolingHttpClientConnectionManager.setDefaultSocketConfig(socketConfig);
-	// 	httpClient = HttpClientBuilder.create()
-	// 							.setConnectionManager(poolingHttpClientConnectionManager)
-	// 							.disableCookieManagement()
-	// 							.setRetryHandler(new HttpRequestRetryHandler())
-	// 							.build();
-	//
-	// 	/** 设置请求超时时间 */
-	// 	requestConfig = RequestConfig.custom().setSocketTimeout(10000).setConnectTimeout(10000)
-	// 	    .setConnectionRequestTimeout(10000).build();
-	// }
 
 	static {
 		try {
