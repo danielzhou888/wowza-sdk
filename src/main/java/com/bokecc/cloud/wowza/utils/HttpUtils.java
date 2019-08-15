@@ -37,14 +37,6 @@ public class HttpUtils extends BaseHttpClient implements IHttpUtils{
     private static final Logger logger = LoggerFactory.getLogger(HttpUtils.class);
 
     /**
-     * 连接管理器
-     */
-    // private static PoolingHttpClientConnectionManager pool;
-    /**
-     * 请求配置
-     */
-    // private static RequestConfig requestConfig;
-    /**
      * 请求返回json数据头信息map
      */
     private static Map<String, String> jsonheaderMap = new ConcurrentHashMap<>();
@@ -57,43 +49,6 @@ public class HttpUtils extends BaseHttpClient implements IHttpUtils{
         jsonheaderMap.put(HttpEnum.CONTENT_TYPE_HEADER.getValue(), HttpEnum.CONTENT_TYPE_JSON_URL.getValue());
         jsonheaderMap.put(HttpEnum.CACHE_CONTROL_HEADER.getValue(), HttpEnum.CACHE_CONTROL_TYPE_NO_CACHE.getValue());
         jsonheaderMap.put(HttpEnum.CONNECTION_HEADER.getValue(), HttpEnum.CONNECTION_TYPE_KEEP_ALIVE.getValue());
-        // try {
-        //     logger.info(" init HttpUtils start ");
-        //     SSLContextBuilder builder = new SSLContextBuilder();
-        //     builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
-        //     SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
-        //         builder.build());
-        //     // 配置同时支持 HTTP 和 HTTPS
-        //     Registry<ConnectionSocketFactory> socketFactoryRegistry =
-        //         RegistryBuilder.<ConnectionSocketFactory> create().register(
-        //             "http", PlainConnectionSocketFactory.getSocketFactory()).register(
-        //             "https", sslsf).build();
-        //     // 初始化连接管理器
-        //     pool = new PoolingHttpClientConnectionManager(
-        //         socketFactoryRegistry);
-        //     // 将最大连接数增加到20000，从配置文件中读取这个值
-        //     pool.setMaxTotal(HttpClientPoolConfig.getValue(HttpClientPoolConst.MAX_TOTAL));
-        //     // 设置最大路由
-        //     pool.setDefaultMaxPerRoute(HttpClientPoolConfig.getValue(HttpClientPoolConst.DEFAULT_MAX_PER_ROUTE));
-        //     // 根据默认超时限制初始化requestConfig
-        //     int socketTimeout = HttpClientPoolConfig.getValue(HttpClientPoolConst.SOCKET_TIMEOUT);
-        //     int connectTimeout = HttpClientPoolConfig.getValue(HttpClientPoolConst.CONNECT_TIMEOUT);
-        //     int connectionRequestTimeout = HttpClientPoolConfig.getValue(HttpClientPoolConst.CONNECTION_REQUEST_TIMEOUT);
-        //     requestConfig = RequestConfig.custom().setConnectionRequestTimeout(
-        //         connectionRequestTimeout).setSocketTimeout(socketTimeout).setConnectTimeout(
-        //         connectTimeout).build();
-        //     logger.info(" init HttpUtils stop ");
-        // } catch (NoSuchAlgorithmException e) {
-        //     logger.error("static code block, error message is {}", e.getMessage());
-        // } catch (KeyStoreException e) {
-        //     logger.error("static code block, error message is {}", e.getMessage());
-        // } catch (KeyManagementException e) {
-        //     logger.error("static code block, error message is {}", e.getMessage());
-        // }
-        //
-        // /** 设置请求超时时间 */
-        // requestConfig = RequestConfig.custom().setSocketTimeout(50000).setConnectTimeout(50000)
-        //     .setConnectionRequestTimeout(50000).build();
     }
 
     /**
