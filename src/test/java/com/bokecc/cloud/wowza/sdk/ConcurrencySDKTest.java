@@ -100,20 +100,20 @@ public class ConcurrencySDKTest {
     public static void main(String[] args) {
         // 多实例
         WowzaSdkMultiFactory.init("192.168.1.86", USERNAME, PASSWORD);
-        WowzaSdkMultiFactory.init("192.168.1.127", USERNAME, PASSWORD);
-        IWowzaSDK WowzaSDK_86 = WowzaSdkMultiFactory.getInstance("192.168.1.86");
+        WowzaSdkMultiFactory.init("192.168.1.189", USERNAME, PASSWORD);
+        IWowzaSDK WowzaSDK_86 = WowzaSdkMultiFactory.getInstance("192.168.1.189");
         IWowzaSDK WowzaSDK_189 = WowzaSdkMultiFactory.getInstance("192.168.1.189");
         //单元测试,录制接口
         // ServiceResponse result_189 = WowzaSDK_189.recordStartNonHoster(streamName, recordJson);
 
         AtomicInteger count = new AtomicInteger();
-        for (int i = 0; i < 10; i++) {
-            pool.execute(() -> {
+        for (int i = 0; i < 1; i++) {
+            // pool.execute(() -> {
                 String baseFile = count.get() + "-" + UUID.randomUUID().toString().replace("-", "") + ".flv";
                 RecordJson recordJson = new RecordJson.Builder().baseFile(baseFile).build();
                 ServiceResponse result_86 = WowzaSDK_86.recordStartNonHoster(String.valueOf(count.get()), recordJson);
                 logger.info((count.getAndIncrement()) + ":::::" + result_86.toJson());
-            });
+            // });
         }
         // Asserts.notEmpty(result_86.toJson(), null);
         // Asserts.notEmpty(result_189.toJson(), null);
