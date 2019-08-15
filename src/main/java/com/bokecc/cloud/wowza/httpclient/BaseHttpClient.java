@@ -15,6 +15,7 @@ import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.slf4j.Logger;
@@ -70,6 +71,10 @@ public abstract class BaseHttpClient {
 		    requestConfig = RequestConfig.custom().setConnectionRequestTimeout(
 		        connectionRequestTimeout).setSocketTimeout(socketTimeout).setConnectTimeout(
 		        connectTimeout).build();
+			httpClient = HttpClientBuilder.create()
+				.setConnectionManager(pool)
+				.disableCookieManagement()
+				.build();
 		} catch (NoSuchAlgorithmException e) {
 		    logger.error("static code block, error message is {}", e.getMessage());
 		} catch (KeyStoreException e) {
