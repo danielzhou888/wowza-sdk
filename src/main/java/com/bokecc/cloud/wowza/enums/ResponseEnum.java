@@ -10,10 +10,7 @@ public enum ResponseEnum {
     REQUEST_IO_ERROR(20010004, "Request IO exception"),
     RESOURCE_CLOSE_ERROR(20010005, "Close resource exception"),
     PARSE_ERROR(20010006, "Result parse exception"),
-    JSON_IS_NULL(20010007, "Request json body cannot be null"),
-    INTERRUPTED_EXCEPTION(20010019, "Interrupted exception"),
-    EXECUTION_EXCEPTION(20010020, "Execution exception"),
-    REQUEST_ERROR(20010021, "Request error");
+    JSON_IS_NULL(20010007, "Request json body cannot be null");
 
     private Integer code;
 

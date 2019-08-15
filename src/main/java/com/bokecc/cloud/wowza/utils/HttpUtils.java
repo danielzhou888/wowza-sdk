@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.*;
@@ -26,8 +25,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
-import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
@@ -39,8 +36,6 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 /**
@@ -200,7 +195,7 @@ public class HttpUtils implements IHttpUtils {
      * @return Reponse info
      */
     private static JSONObject doGetOrDelete(WowzaSDK WowzaSDK, HttpRequestBase httpRequest, Map<String, String> headers) {
-        CloseableHttpAsyncClient httpClient;
+        CloseableHttpClient httpClient;
         // 响应内容
         JSONObject responseContent;
         // 创建默认的httpClient实例.
@@ -229,18 +224,13 @@ public class HttpUtils implements IHttpUtils {
      * @return
      * @throws IOException
      */
-    private static JSONObject excuteRequest(CloseableHttpAsyncClient httpClient, WowzaSDK WowzaSDK,
+    private static JSONObject excuteRequest(CloseableHttpClient httpClient, WowzaSDK WowzaSDK,
         HttpRequestBase httpRequest) {
         WowzaSDK.nc.get().incrementAndGet();
-        // TODO
-        HttpResponse response = null;
-        // CloseableHttpResponse response = null;
-
+        CloseableHttpResponse response = null;
         JSONObject responseContent;
         try {
-            httpClient.start();
-            Future<HttpResponse> responseFuture = httpClient.execute(httpRequest, null);
-            response = responseFuture.get();
+            response = httpClient.execute(httpRequest);
             HttpEntity entity = response.getEntity();
             String responseContentStr = EntityUtils.toString(entity, HttpEnum.CHARSET_UTF_8.getValue());
             responseContent = formatResponseContent(responseContentStr);
@@ -257,17 +247,11 @@ public class HttpUtils implements IHttpUtils {
         } catch (IOException e) {
             logger.error("doHttpRequest run, error message is {}", e.getMessage());
             responseContent = JsonUtils.getResponseJsonBody(ResponseEnum.REQUEST_IO_ERROR.getCode(), ResponseEnum.REQUEST_IO_ERROR.getMsg(), false);
-        } catch (InterruptedException e) {
-            logger.error("doHttpRequest run, error message is {}", e.getMessage());
-            responseContent = JsonUtils.getResponseJsonBody(ResponseEnum.INTERRUPTED_EXCEPTION.getCode(), ResponseEnum.REQUEST_IO_ERROR.getMsg(), false);
-        } catch (ExecutionException e) {
-            logger.error("doHttpRequest run, error message is {}", e.getMessage());
-            responseContent = JsonUtils.getResponseJsonBody(ResponseEnum.EXECUTION_EXCEPTION.getCode(), ResponseEnum.REQUEST_IO_ERROR.getMsg(), false);
         } finally {
             try {
                 // 释放资源
-                if (httpClient != null) {
-                    httpClient.close();
+                if (response != null) {
+                    response.close();
                 }
             } catch (IOException e) {
                 logger.error("doHttpRequest run, error message is {}", e.getMessage());
@@ -287,9 +271,8 @@ public class HttpUtils implements IHttpUtils {
      * @return
      * @throws IOException
      */
-    private static JSONObject getResponseContentFromWowza3rd(String responseContent, HttpResponse response,
-        CloseableHttpAsyncClient httpClient, WowzaSDK WowzaSDK, HttpRequestBase httpRequest)
-        throws IOException, ExecutionException, InterruptedException {
+    private static JSONObject getResponseContentFromWowza3rd(String responseContent, CloseableHttpResponse response,
+        CloseableHttpClient httpClient, WowzaSDK WowzaSDK, HttpRequestBase httpRequest) throws IOException {
         List<Header> authHeaderList = Arrays.asList(response.getHeaders(WowzaAuthEnum.WWW_AUTHENTICATE.getValue())).stream()
             .filter(h -> h.getName().trim().equals(WowzaAuthEnum.WWW_AUTHENTICATE.getValue())).collect(Collectors.toList());
         if (authHeaderList != null && authHeaderList.size() > 0) {
@@ -309,9 +292,8 @@ public class HttpUtils implements IHttpUtils {
      * @throws IOException
      */
     private static JSONObject getResponseContentFromWowza(JSONObject responseContent,
-        HttpResponse response,
-        CloseableHttpAsyncClient httpClient, WowzaSDK WowzaSDK, HttpRequestBase httpRequest)
-        throws IOException, ExecutionException, InterruptedException {
+        CloseableHttpResponse response,
+        CloseableHttpClient httpClient, WowzaSDK WowzaSDK, HttpRequestBase httpRequest) throws IOException {
             if (responseContent != null && StringUtils.isNotEmpty(responseContent.getString(WowzaRespEnum.RESP_API_CODE_KEY.getValue())) && responseContent.getString(WowzaRespEnum.RESP_API_CODE_KEY.getValue())
                 .equals(WowzaRespEnum.WOWZA_AUTH_ERROR_CODE.getValue())) {
                 String wwwAuthenticateHeader = getWWWAuthenticateHeader(response);
@@ -333,8 +315,7 @@ public class HttpUtils implements IHttpUtils {
      * @throws IOException
      */
     private static JSONObject doRequestWithAuthHeader(String responseContent,
-        CloseableHttpAsyncClient httpClient, HttpRequestBase httpRequest, WowzaSDK WowzaSDK)
-        throws IOException, ExecutionException, InterruptedException {
+        CloseableHttpClient httpClient, HttpRequestBase httpRequest, WowzaSDK WowzaSDK) throws IOException {
         String method = httpRequest.getMethod();
         URI uri = httpRequest.getURI();
         String path = "";
@@ -352,8 +333,7 @@ public class HttpUtils implements IHttpUtils {
             }
             String authorizationValue = WowzaSDK.getAuthorization(path, method);
             httpRequest.setHeader(HttpEnum.AUTHORIZATION_HEADER.getValue(), authorizationValue);
-            Future<HttpResponse> responseFuture = httpClient.execute(httpRequest, null);
-            HttpResponse response = responseFuture.get();
+            CloseableHttpResponse response = httpClient.execute(httpRequest);
             // 得到响应实例
             HttpEntity entity = response.getEntity();
             String result = EntityUtils.toString(entity, HttpEnum.CHARSET_UTF_8.getValue());
@@ -370,7 +350,7 @@ public class HttpUtils implements IHttpUtils {
      *
      * @return WWW-Authenticate headers value
      */
-    private static String getWWWAuthenticateHeader(HttpResponse response) {
+    private static String getWWWAuthenticateHeader(CloseableHttpResponse response) {
         Header[] headers = response.getHeaders(WowzaAuthEnum.WWW_AUTHENTICATE.getValue());
         String wwwAuthHeaderValue = "";
         if (headers != null && headers.length > 0) {
@@ -390,7 +370,7 @@ public class HttpUtils implements IHttpUtils {
      *
      * @return
      */
-    private static CloseableHttpAsyncClient getHttpClient() {
+    private static CloseableHttpClient getHttpClient() {
 
         // CloseableHttpClient httpClient = HttpClients.custom()
         //     // 设置连接池管理
@@ -401,15 +381,7 @@ public class HttpUtils implements IHttpUtils {
         //     .setRetryHandler(new DefaultHttpRequestRetryHandler(0, false))
         //     .build();
 
-        CloseableHttpAsyncClient httpClient = HttpAsyncClients.createDefault();
-            // // 设置连接池管理
-            // .setConnectionManager(pool)
-            // // 设置请求配置
-            // .setDefaultRequestConfig(requestConfig)
-            // // 设置重试次数
-            // .setRetryHandler(new DefaultHttpRequestRetryHandler(0, false))
-            // .build();
-
+        CloseableHttpClient httpClient = HttpClients.createDefault();
 
         return httpClient;
     }
@@ -451,7 +423,7 @@ public class HttpUtils implements IHttpUtils {
      * @return Response info
      */
     private static JSONObject doHttpRequest(WowzaSDK WowzaSDK, HttpRequestBase httpRequest, Map<String, String> headers) {
-        CloseableHttpAsyncClient httpClient;
+        CloseableHttpClient httpClient;
         // 响应内容
         JSONObject responseContent;
         // 创建默认的httpClient实例.
