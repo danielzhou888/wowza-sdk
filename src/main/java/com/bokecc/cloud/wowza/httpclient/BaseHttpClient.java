@@ -39,7 +39,7 @@ public abstract class BaseHttpClient {
 	/**
 	 * 连接管理器
 	 */
-	protected static PoolingHttpClientConnectionManager pool;
+	private static PoolingHttpClientConnectionManager pool;
 	/**
 	 * 请求配置
 	 */

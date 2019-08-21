@@ -87,25 +87,32 @@ public class HttpClientPool {
         HttpRequestRetryHandler httpRequestRetryHandler = new HttpRequestRetryHandler() {
             @Override
             public boolean retryRequest(IOException exception,int executionCount, HttpContext context) {
-                if (executionCount >= 3) {// 如果已经重试了3次，就放弃
+                // 如果已经重试了3次，就放弃
+                if (executionCount >= 3) {
                     return false;
                 }
-                if (exception instanceof NoHttpResponseException) {// 如果服务器丢掉了连接，那么就重试
+                // 如果服务器丢掉了连接，那么就重试
+                if (exception instanceof NoHttpResponseException) {
                     return true;
                 }
-                if (exception instanceof SSLHandshakeException) {// 不要重试SSL握手异常
+                // 不要重试SSL握手异常
+                if (exception instanceof SSLHandshakeException) {
                     return false;
                 }
-                if (exception instanceof InterruptedIOException) {// 超时
+                // 超时
+                if (exception instanceof InterruptedIOException) {
                     return false;
                 }
-                if (exception instanceof UnknownHostException) {// 目标服务器不可达
+                // 目标服务器不可达
+                if (exception instanceof UnknownHostException) {
                     return false;
                 }
-                if (exception instanceof ConnectTimeoutException) {// 连接被拒绝
+                // 连接被拒绝
+                if (exception instanceof ConnectTimeoutException) {
                     return false;
                 }
-                if (exception instanceof SSLException) {// SSL握手异常
+                // SSL握手异常
+                if (exception instanceof SSLException) {
                     return false;
                 }
 
@@ -127,7 +134,9 @@ public class HttpClientPool {
         return httpClient;
     }
 
-    //用于监控空闲的连接池连接
+    /**
+     * 用于监控空闲的连接池连接
+     */
     private static final class IdleConnectionMonitorThread extends Thread {
         private final HttpClientConnectionManager connMgr;
         private volatile boolean shutdown;
@@ -158,12 +167,5 @@ public class HttpClientPool {
             }
         }
 
-        // 关闭后台连接
-        public void shutdown() {
-            shutdown = true;
-            synchronized (this) {
-                notifyAll();
-            }
-        }
     }
 }

@@ -16,6 +16,9 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ThreadPoolExecutor;
 
+/**
+ * 单元测试
+ */
 public class WowzaSDKTest {
 
     private static final Logger logger = LoggerFactory.getLogger(WowzaSDKTest.class);
