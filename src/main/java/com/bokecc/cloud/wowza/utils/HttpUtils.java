@@ -3,7 +3,6 @@ package com.bokecc.cloud.wowza.utils;
 import com.alibaba.fastjson.JSONObject;
 import com.bokecc.cloud.wowza.constant.WowzaAuthConst;
 import com.bokecc.cloud.wowza.enums.*;
-import com.bokecc.cloud.wowza.handler.HttpRequestRetryHandler;
 import com.bokecc.cloud.wowza.httpclient.BaseHttpClient;
 import com.bokecc.cloud.wowza.sdk.WowzaSDK;
 import org.apache.commons.lang3.StringUtils;
@@ -13,7 +12,6 @@ import org.apache.http.ParseException;
 import org.apache.http.client.methods.*;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,29 +47,6 @@ public class HttpUtils extends BaseHttpClient implements IHttpUtils{
         jsonheaderMap.put(HttpEnum.CONTENT_TYPE_HEADER.getValue(), HttpEnum.CONTENT_TYPE_JSON_URL.getValue());
         jsonheaderMap.put(HttpEnum.CACHE_CONTROL_HEADER.getValue(), HttpEnum.CACHE_CONTROL_TYPE_NO_CACHE.getValue());
         jsonheaderMap.put(HttpEnum.CONNECTION_HEADER.getValue(), HttpEnum.CONNECTION_TYPE_KEEP_ALIVE.getValue());
-    }
-
-    /**
-     * Get CloseableHttpClient instance
-     *
-     * @return
-     */
-    private static CloseableHttpClient getHttpClient() {
-
-        CloseableHttpClient httpClient = HttpClients.custom()
-            // 设置连接池管理
-            .setConnectionManager(pool)
-            // 设置请求配置
-            .setDefaultRequestConfig(requestConfig)
-            // 设置重试次数
-            // .setRetryHandler(new DefaultHttpRequestRetryHandler(3, true))
-            // 设置重试处理机制
-            .setRetryHandler(new HttpRequestRetryHandler())
-            .build();
-
-        // CloseableHttpClient httpClient = HttpClients.createDefault();
-
-        return httpClient;
     }
 
     @Override
