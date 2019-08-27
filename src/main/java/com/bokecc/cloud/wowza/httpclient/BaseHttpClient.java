@@ -73,10 +73,7 @@ public abstract class BaseHttpClient {
 		        connectTimeout).build();
 			httpClient = HttpClientBuilder.create()
 				.setConnectionManager(pool)
-<<<<<<< HEAD
 				.setRetryHandler(new HttpRequestRetryHandler())
-=======
->>>>>>> d3566bdc24aeacb556d6e67a21f18e65f936aeb6
 				.disableCookieManagement()
 				.build();
 		} catch (NoSuchAlgorithmException e) {
