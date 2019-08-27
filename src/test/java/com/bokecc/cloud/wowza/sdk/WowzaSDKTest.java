@@ -4,6 +4,7 @@ package com.bokecc.cloud.wowza.sdk;
 import com.bokecc.cloud.wowza.entity.RecordJson;
 import com.bokecc.cloud.wowza.enums.HostIndexEnum;
 import com.bokecc.cloud.wowza.result.ServiceResponse;
+import com.bokecc.cloud.wowza.utils.WowzaSdkFactory;
 import com.bokecc.cloud.wowza.utils.WowzaSdkMultiFactory;
 import org.apache.http.util.Asserts;
 import org.junit.jupiter.api.AfterAll;
@@ -56,7 +57,8 @@ public class WowzaSDKTest {
     // private String streamName = "336FC0376EFD232333DC5901307431";
     // private String streamName = "446FC0376EFD232333DC5901307431";
     // private String streamName = "556FC0376EFD232333DC5901307431";
-    private String streamName = "666FC0376EFD232333DC5901307431";
+    // private String streamName = "666FC0376EFD232333DC5901307431";
+    private String streamName = "777FC0376EFD232333DC5901307431";
     // private String streamName = "241CC3BD7FBBBCB19C33DC5901307461";
     // private String streamName = "C2F12381D8C24DF79C33DC5901307461";
     // private String streamName = "1CE1399FD41CF9129C33DC5901307461";
@@ -298,5 +300,6 @@ public class WowzaSDKTest {
         logger.info(result.toJson());
         Asserts.notEmpty(result.toJson(), null);
     }
+
 
 }
