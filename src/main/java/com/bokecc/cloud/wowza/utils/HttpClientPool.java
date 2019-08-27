@@ -30,7 +30,10 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Daniel Zhou / zzx
  **/
+<<<<<<< HEAD
 @Deprecated
+=======
+>>>>>>> d3566bdc24aeacb556d6e67a21f18e65f936aeb6
 public class HttpClientPool {
     static final int timeOut = 1000;
     private static CloseableHttpClient httpClient = null;
