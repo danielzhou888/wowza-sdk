@@ -16,16 +16,20 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ThreadPoolExecutor;
 
+/**
+ * 单元测试
+ */
 public class WowzaSDKTest {
 
     private static final Logger logger = LoggerFactory.getLogger(WowzaSDKTest.class);
 
     // private static final String IP = "http://192.168.200.117";
     // private static final String IP = "http://106.14.166.132";
-    private static final String IP = "http://192.168.1.86";
-    // private static final String IP = "http://192.168.1.189";
+    // private static final String IP = "http://192.168.1.86";
+    private static final String IP = "http://192.168.1.189";
     // private static final String IP = "http://192.168.1.127";
     // private static final String IP = "http://47.101.197.110";
+    // private static final String IP = "http://47.93.17.14";
     // private static final String IP = "http://218.60.53.11";
     // private static final String IP = "http://39.106.114.63";
     // private static final String IP = "http://119.23.200.43";
@@ -45,7 +49,14 @@ public class WowzaSDKTest {
     // private String streamName = "1F54E375C74E11F49C33DC5901307461";
     // private String streamName = "BA4544AE314C3AF59C33DC5901307461";
     // private String streamName = "1B5A87B912A03F179C33DC5901307461";
-    private String streamName = "6FA89732CD75C4DE9C33DC5901307461";
+    // private String streamName = "6FA89732CD75C4DE9C33DC5901307461";
+    // private String streamName = "326FC0376EFD2AF79C33DC5901307461";
+    // private String streamName = "116FC0376EFD232333DC5901307431";
+    // private String streamName = "226FC0376EFD232333DC5901307431";
+    // private String streamName = "336FC0376EFD232333DC5901307431";
+    // private String streamName = "446FC0376EFD232333DC5901307431";
+    // private String streamName = "556FC0376EFD232333DC5901307431";
+    private String streamName = "666FC0376EFD232333DC5901307431";
     // private String streamName = "241CC3BD7FBBBCB19C33DC5901307461";
     // private String streamName = "C2F12381D8C24DF79C33DC5901307461";
     // private String streamName = "1CE1399FD41CF9129C33DC5901307461";
@@ -76,31 +87,39 @@ public class WowzaSDKTest {
 
     @Test
     public void testrecordStartByWowzaSelf() {
-        // Map<String, Object> jsonMap = JSONObject.parseObject(recordJson, Map.class);
+        String baseFile = streamName + "-" + UUID.randomUUID().toString().replace("-", "") + ".flv";
         RecordJson recordJson = new RecordJson.Builder().baseFile(baseFile).build();
         //单元测试,录制接口
-        // String result = WowzaSDK.recordStartByWowzaSelf(null, null,appName, null, streamName+"_host_transcode", jsonMap);
-        ServiceResponse result = WowzaSDK.recordStartByWowzaSelf(appName, streamName+"_0", recordJson);
-        // String result = WowzaSDK.recordStartByWowzaSelf(null, null,appName, null, streamName+"_record_transcode", jsonMap);
+        ServiceResponse result = WowzaSDK.recordStartByWowzaSelf(appName, streamName, recordJson);
         logger.info(result.toJson());
         Asserts.notEmpty(result.toJson(), null);
     }
 
     @Test
-    public void testrecordStopByWowzaSelf() {
-        // Map<String, Object> jsonMap = JSONObject.parseObject(recordJson, Map.class);
-        // Map<String, Object> jsonMap = new HashMap<>(JSONObject.fromObject(postData));
+    public void testrecordStartAndStopByWowzaSelf() throws InterruptedException {
+        for (int i = 0; i < 20; i++) {
+            String baseFile = streamName + "-" + UUID.randomUUID().toString().replace("-", "") + ".flv";
+            RecordJson recordJson = new RecordJson.Builder().baseFile(baseFile).build();
+            //单元测试,录制接口
+            ServiceResponse result = WowzaSDK.recordStartByWowzaSelf(appName, streamName, recordJson);
+            Thread.sleep(10000);
+            ServiceResponse stopResult = WowzaSDK.recordStopByWowzaSelf(appName, streamName);
+            Thread.sleep(2000);
+            logger.info(result.toJson());
+            logger.info(stopResult.toJson());
+        }
+    }
 
+    @Test
+    public void testrecordStopByWowzaSelf() {
         //单元测试,录制接口
-        ServiceResponse result = WowzaSDK.recordStopByWowzaSelf(appName,streamName+"_0");
-        // String result = WowzaSDK.recordStopByWowzaSelf(null, null,appName, null, streamName+"_host_transcode", jsonMap);
+        ServiceResponse result = WowzaSDK.recordStopByWowzaSelf(appName,streamName);
         logger.info(result.toJson());
         Asserts.notEmpty(result.toJson(), null);
     }
 
     @Test
     public void testRecordStart() {
-        // Map<String, Object> jsonMap = JSONObject.parseObject(recordJson, Map.class);
         RecordJson recordJson = new RecordJson.Builder().baseFile(baseFile).build();
         //单元测试,录制接口
         ServiceResponse result = WowzaSDK.recordStart(appName, streamName+"_0", recordJson);
@@ -121,7 +140,6 @@ public class WowzaSDKTest {
 
     @Test
     public void testrecordPauseHoster() {
-        // Map<String, Object> jsonMap = JSONObject.parseObject(recordJson, Map.class);
         //单元测试,录制接口
         ServiceResponse result = WowzaSDK.recordPauseHoster(streamName);
         logger.info(result.toJson());
@@ -130,7 +148,6 @@ public class WowzaSDKTest {
 
     @Test
     public void testRecordStop() {
-        // Map<String, Object> jsonMap = JSONObject.parseObject(recordJson, Map.class);
         //单元测试,录制接口
         ServiceResponse result = WowzaSDK.recordStop(appName, streamName+"_host_transcode");
         logger.info(result.toJson());
@@ -165,23 +182,35 @@ public class WowzaSDKTest {
 
     @Test
     public void testLivingStartHoster() {
-        // String result = WowzaSDK.hostStartPublish(null, null, streamName, "1");
         ServiceResponse result = WowzaSDK.livingStartHoster(streamName, HostIndexEnum.ZERO);
         logger.info(result.toJson());
         Asserts.notEmpty(result.toJson(), null);
-    }
+}
 
     @Test
     public void testLivingStartHosterAndRecordStartHoster() throws InterruptedException {
 
-        RecordJson recordJson = new RecordJson.Builder().baseFile(baseFile).build();
-        ServiceResponse recordResult = WowzaSDK.recordStartHoster(streamName, recordJson);
-        logger.info(recordResult.toJson());
 
         System.out.println("----------------------------------");
 
-        ServiceResponse hostResult = WowzaSDK.livingStartHoster(streamName, HostIndexEnum.ZERO);
-        logger.info(hostResult.toJson());
+        for (int i = 0; i < 80; i++) {
+            String baseFile = streamName + "-" + UUID.randomUUID().toString().replace("-", "") + ".flv";
+            RecordJson recordJson = new RecordJson.Builder().baseFile(baseFile).build();
+            Thread.sleep(2000);
+            // if (i == 0) {
+                ServiceResponse hostResult = WowzaSDK.livingStartHoster(streamName, HostIndexEnum.ZERO);
+                logger.info(hostResult.toJson());
+            // }
+            ServiceResponse recordResult = WowzaSDK.recordStartHoster(streamName, recordJson);
+
+            logger.info(recordResult.toJson());
+            Thread.sleep(10000);
+            ServiceResponse recordStopHosterResult = WowzaSDK.recordStopHoster(streamName);
+
+            logger.info(recordStopHosterResult.toJson());
+            ServiceResponse livingStopHoster = WowzaSDK.livingStopHoster(streamName);
+            logger.info(livingStopHoster.toJson());
+        }
     }
 
     public static void main(String[] args) throws InterruptedException {
@@ -258,7 +287,6 @@ public class WowzaSDKTest {
 
     @Test
     public void testretrievesRecorderStatus() {
-        // String result = WowzaSDK.retrievesRecorderStatus(null, null, appName, null, streamName);
         ServiceResponse result = WowzaSDK.retrievesRecorderStatus(appName,streamName + "_record_transcode");
         logger.info(result.toJson());
         Asserts.notEmpty(result.toJson(), null);

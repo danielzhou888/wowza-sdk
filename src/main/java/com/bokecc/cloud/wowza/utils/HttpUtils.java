@@ -1,39 +1,22 @@
 package com.bokecc.cloud.wowza.utils;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.bokecc.cloud.wowza.config.HttpClientPoolConfig;
-import com.bokecc.cloud.wowza.constant.HttpClientPoolConst;
 import com.bokecc.cloud.wowza.constant.WowzaAuthConst;
 import com.bokecc.cloud.wowza.enums.*;
+import com.bokecc.cloud.wowza.httpclient.BaseHttpClient;
 import com.bokecc.cloud.wowza.sdk.WowzaSDK;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.ParseException;
-import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.*;
-import org.apache.http.config.Registry;
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URI;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -47,18 +30,10 @@ import java.util.stream.Collectors;
  * @author Daniel Zhou / zzx
  *
  */
-public class HttpUtils implements IHttpUtils {
+public class HttpUtils extends BaseHttpClient implements IHttpUtils{
 
     private static final Logger logger = LoggerFactory.getLogger(HttpUtils.class);
 
-    /**
-     * 连接管理器
-     */
-    private static PoolingHttpClientConnectionManager pool;
-    /**
-     * 请求配置
-     */
-    private static RequestConfig requestConfig;
     /**
      * 请求返回json数据头信息map
      */
@@ -72,43 +47,6 @@ public class HttpUtils implements IHttpUtils {
         jsonheaderMap.put(HttpEnum.CONTENT_TYPE_HEADER.getValue(), HttpEnum.CONTENT_TYPE_JSON_URL.getValue());
         jsonheaderMap.put(HttpEnum.CACHE_CONTROL_HEADER.getValue(), HttpEnum.CACHE_CONTROL_TYPE_NO_CACHE.getValue());
         jsonheaderMap.put(HttpEnum.CONNECTION_HEADER.getValue(), HttpEnum.CONNECTION_TYPE_KEEP_ALIVE.getValue());
-        try {
-            logger.info(" init HttpUtils start ");
-            SSLContextBuilder builder = new SSLContextBuilder();
-            builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
-            SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(
-                builder.build());
-            // 配置同时支持 HTTP 和 HTTPS
-            Registry<ConnectionSocketFactory> socketFactoryRegistry =
-                RegistryBuilder.<ConnectionSocketFactory> create().register(
-                    "http", PlainConnectionSocketFactory.getSocketFactory()).register(
-                    "https", sslsf).build();
-            // 初始化连接管理器
-            pool = new PoolingHttpClientConnectionManager(
-                socketFactoryRegistry);
-            // 将最大连接数增加到20000，从配置文件中读取这个值
-            pool.setMaxTotal(HttpClientPoolConfig.getValue(HttpClientPoolConst.MAX_TOTAL));
-            // 设置最大路由
-            pool.setDefaultMaxPerRoute(HttpClientPoolConfig.getValue(HttpClientPoolConst.DEFAULT_MAX_PER_ROUTE));
-            // 根据默认超时限制初始化requestConfig
-            int socketTimeout = HttpClientPoolConfig.getValue(HttpClientPoolConst.SOCKET_TIMEOUT);
-            int connectTimeout = HttpClientPoolConfig.getValue(HttpClientPoolConst.CONNECT_TIMEOUT);
-            int connectionRequestTimeout = HttpClientPoolConfig.getValue(HttpClientPoolConst.CONNECTION_REQUEST_TIMEOUT);
-            requestConfig = RequestConfig.custom().setConnectionRequestTimeout(
-                connectionRequestTimeout).setSocketTimeout(socketTimeout).setConnectTimeout(
-                connectTimeout).build();
-            logger.info(" init HttpUtils stop ");
-        } catch (NoSuchAlgorithmException e) {
-            logger.error("static code block, error message is {}", e.getMessage());
-        } catch (KeyStoreException e) {
-            logger.error("static code block, error message is {}", e.getMessage());
-        } catch (KeyManagementException e) {
-            logger.error("static code block, error message is {}", e.getMessage());
-        }
-
-        /** 设置请求超时时间 */
-        requestConfig = RequestConfig.custom().setSocketTimeout(50000).setConnectTimeout(50000)
-            .setConnectionRequestTimeout(50000).build();
     }
 
     @Override
@@ -195,11 +133,12 @@ public class HttpUtils implements IHttpUtils {
      * @return Reponse info
      */
     private static JSONObject doGetOrDelete(WowzaSDK WowzaSDK, HttpRequestBase httpRequest, Map<String, String> headers) {
-        CloseableHttpClient httpClient;
+        // TODO
+        // CloseableHttpClient httpClient;
         // 响应内容
         JSONObject responseContent;
         // 创建默认的httpClient实例.
-        httpClient = getHttpClient();
+        // httpClient = getHttpClient();
         // 配置请求信息
         httpRequest.setConfig(requestConfig);
         // 设置请求头
@@ -273,6 +212,7 @@ public class HttpUtils implements IHttpUtils {
      */
     private static JSONObject getResponseContentFromWowza3rd(String responseContent, CloseableHttpResponse response,
         CloseableHttpClient httpClient, WowzaSDK WowzaSDK, HttpRequestBase httpRequest) throws IOException {
+
         List<Header> authHeaderList = Arrays.asList(response.getHeaders(WowzaAuthEnum.WWW_AUTHENTICATE.getValue())).stream()
             .filter(h -> h.getName().trim().equals(WowzaAuthEnum.WWW_AUTHENTICATE.getValue())).collect(Collectors.toList());
         if (authHeaderList != null && authHeaderList.size() > 0) {
@@ -366,27 +306,6 @@ public class HttpUtils implements IHttpUtils {
     }
 
     /**
-     * Get CloseableHttpClient instance
-     *
-     * @return
-     */
-    private static CloseableHttpClient getHttpClient() {
-
-        // CloseableHttpClient httpClient = HttpClients.custom()
-        //     // 设置连接池管理
-        //     .setConnectionManager(pool)
-        //     // 设置请求配置
-        //     .setDefaultRequestConfig(requestConfig)
-        //     // 设置重试次数
-        //     .setRetryHandler(new DefaultHttpRequestRetryHandler(0, false))
-        //     .build();
-
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-
-        return httpClient;
-    }
-
-    /**
      * Send an post request
      *
      * @param httpUrl Entire http url
@@ -423,11 +342,12 @@ public class HttpUtils implements IHttpUtils {
      * @return Response info
      */
     private static JSONObject doHttpRequest(WowzaSDK WowzaSDK, HttpRequestBase httpRequest, Map<String, String> headers) {
-        CloseableHttpClient httpClient;
+        // TODO
+        // CloseableHttpClient httpClient;
         // 响应内容
         JSONObject responseContent;
         // 创建默认的httpClient实例.
-        httpClient = getHttpClient();
+        // httpClient = getHttpClient();
         // 配置请求信息
         httpRequest.setConfig(requestConfig);
         // 设置请求头

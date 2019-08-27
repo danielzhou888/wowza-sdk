@@ -3,7 +3,6 @@ package com.bokecc.cloud.wowza.sdk;
 import com.bokecc.cloud.wowza.entity.RecordJson;
 import com.bokecc.cloud.wowza.result.ServiceResponse;
 import com.bokecc.cloud.wowza.utils.WowzaSdkMultiFactory;
-import org.apache.http.util.Asserts;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
