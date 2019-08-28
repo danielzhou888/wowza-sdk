@@ -3,6 +3,7 @@ package com.bokecc.cloud.wowza.result;
 import com.alibaba.fastjson.JSONObject;
 import com.bokecc.cloud.wowza.enums.ResponseEnum;
 import com.bokecc.cloud.wowza.enums.WowzaRespEnum;
+import com.bokecc.cloud.wowza.utils.JsonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 
@@ -113,5 +114,13 @@ public class ServiceResponse<T> implements Serializable {
 
     public String toJson() {
         return JSONObject.toJSONString(this);
+    }
+
+    public JSONObject getDataJson() {
+        if (data != null && JsonUtils.isJSONValid(JSONObject.toJSONString(data))) {
+            String var1 = JSONObject.toJSONString(data);
+            return JSONObject.parseObject(var1);
+        }
+        return null;
     }
 }
