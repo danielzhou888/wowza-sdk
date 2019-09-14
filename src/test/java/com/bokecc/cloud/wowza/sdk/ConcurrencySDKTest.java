@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * 并发测试
  * <p><em>Copyright:</em> All Rights Reserved</p>
- * <p><em>Company:</em> 创盛视联数码科技（北京）有限公司   https://www.bokecc.com/</p>
+ * <p><em>Company:</em> Java猿社区</p>
  *
  * @author Daniel Zhou / zzx
  **/
