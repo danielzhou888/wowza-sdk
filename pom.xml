@@ -18,7 +18,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <fastjson.version>1.2.31</fastjson.version>
-        <jackson.version>2.9.8</jackson.version>
+        <jackson.version>2.10.0</jackson.version>
         <slf4j.jcl-over-slf4j.version>1.8.0-beta2</slf4j.jcl-over-slf4j.version>
         <jul-to-slf4j.version>1.8.0-beta2</jul-to-slf4j.version>
         <slf4j-log4j12.version>1.8.0-beta2</slf4j-log4j12.version>
