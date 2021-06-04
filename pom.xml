@@ -24,7 +24,7 @@
         <slf4j-log4j12.version>1.8.0-beta2</slf4j-log4j12.version>
         <slf4j-api.version>1.8.0-beta2</slf4j-api.version>
         <log4j.version>1.2.17</log4j.version>
-        <apache.httpclient.version>4.5.8</apache.httpclient.version>
+        <apache.httpclient.version>4.5.13</apache.httpclient.version>
         <apache.lang.version>3.9</apache.lang.version>
         <junit.version>5.4.2</junit.version>
     </properties>
